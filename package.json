@@ -5,7 +5,7 @@
     "main": "dist/build.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build:npm": "webpack --config webpack/npm.config.js --mode=production --env production --progress",
+        "build:npm": "NODE_OPTIONS=--openssl-legacy-provider webpack --config webpack/npm.config.js --mode=production --env production --progress",
         "build:githubPages": "webpack --config webpack/githubPages.config.js --mode=production --env production --progress",
         "build:githubPages:serve": "webpack serve --config webpack/githubPages.config.js --mode=development"
     },
