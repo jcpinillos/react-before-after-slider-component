@@ -1,4 +1,4 @@
-# React before after slider component
+# React node before after slider component
 Simple slider component for comparing images. Before and after.
 
 [![screencast demo](./screencast.gif)](./screencast.gif)
@@ -9,7 +9,7 @@ https://smeleshkin.github.io/react-before-after-slider-component/
 npm run build:npm
 ## Basic usage
 ```
-npm install react-before-after-slider-component --save
+npm install react-node-before-after-slider-component --save
 ```
 
 Then use it in your app:
@@ -30,6 +30,16 @@ const SECOND_IMAGE = {
     secondImage={SECOND_IMAGE}
 />
 /* ... */
+/* or you can use a component*/
+
+const FIRST_COMPONENT = <GatsbyImage image={firstImage.gatsbyImage} alt={firstImage.alt} />;
+const SECOND_COMPONENT = <GatsbyImage image={secondImage.gatsbyImage} alt={secondImage.alt} />;
+
+<ReactBeforeSliderComponent
+    firstComponent={FIRST_COMPONENT}
+    secondComponent={SECOND_COMPONENT}
+/>
+/* ... */
 ```
 ## Props
 
@@ -46,6 +56,8 @@ const SECOND_IMAGE = {
 | `onChangePercentPosition`  | false     | function            |         | On delimiter position update callback. Has new position parameter.
 | `feelsOnlyTheDelimiter`    | false     | function            | false   | Only the separator feels clicks. Not any zone of the component.
 | `delimiterIconStyles`      | false     | React.CSSProperties |         | Custom styles of delimiter icon. E.g. for a logo. See "Custom logo example"
+| `firstComponent`           | false     | ReactNode           |         | A component like GatsbyImage to use a component instead of imageUrl
+| `secondComponent`          | false     | ReactNode           |         | A component like GatsbyImage to use a component instead of imageUrl
 
 ## Specific Types
 
