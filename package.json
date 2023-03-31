@@ -10,7 +10,7 @@
         "build:githubPages:serve": "webpack serve --config webpack/githubPages.config.js --mode=development"
     },
     "types": "dist/index.d.ts",
-    "author": "smelesh23@gmail.com",
+    "author": "juanpinillos@gmail.com",
     "license": "MIT",
     "devDependencies": {
         "@types/react": "^17.0.2",
@@ -40,7 +40,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com:smeleshkin/react-before-after-slider-component.git"
+        "url": "git+ssh://git@github.com:jcpinillos/react-node-before-after-slider-component.git"
     },
     "keywords": [
         "react",

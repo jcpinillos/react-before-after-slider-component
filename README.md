@@ -1,5 +1,5 @@
 # React node before after slider component
-Simple slider component for comparing images. Before and after.
+Simple slider component for comparing images. Before and after.  This is a fork of https://github.com/smeleshkin/react-before-after-slider-component
 
 [![screencast demo](./screencast.gif)](./screencast.gif)
 
