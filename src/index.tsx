@@ -1,4 +1,11 @@
-import React, {MouseEventHandler, TouchEventHandler, useEffect, useRef, useState} from 'react';
+import React, {
+    MouseEventHandler,
+    ReactNode,
+    TouchEventHandler,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 
 import './styles.scss';
 
@@ -9,7 +16,7 @@ export function isIntersectionObserverSupport() {
 
 export interface Image {
     imageUrl: string;
-    alt?: string,
+    alt?: string;
 }
 
 type OnSliderLoadCallback = () => void;
@@ -20,17 +27,19 @@ enum MODE {
 }
 
 interface Props {
-    firstImage: Image,
-    secondImage: Image,
-    currentPercentPosition?: number,
-    className?: string,
-    withResizeFeel?: boolean,
-    onReady?: OnSliderLoadCallback,
-    onVisible?: () => void,
-    onChangePercentPosition?: (newPosition: number) => void,
-    feelsOnlyTheDelimiter?: boolean,
-    delimiterIconStyles?: React.CSSProperties,
-    delimiterColor?: string,
+    firstImage: Image;
+    secondImage: Image;
+    currentPercentPosition?: number;
+    className?: string;
+    withResizeFeel?: boolean;
+    onReady?: OnSliderLoadCallback;
+    onVisible?: () => void;
+    onChangePercentPosition?: (newPosition: number) => void;
+    feelsOnlyTheDelimiter?: boolean;
+    delimiterIconStyles?: React.CSSProperties;
+    delimiterColor?: string;
+    firstComponent: ReactNode;
+    secondComponent: ReactNode;
 }
 
 function useReadyStatus(
@@ -43,33 +52,41 @@ function useReadyStatus(
     const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
     const incrementLoadedImagesCount = () => {
         setImagesLoadedCount(imagesLoadedCount + 1);
-    }
+    };
 
     useEffect(() => {
-        if (!isReady && imagesLoadedCount === 2 && imagesWidth && refContainer.current) {
+        if (
+            !isReady &&
+            imagesLoadedCount === 2 &&
+            imagesWidth &&
+            refContainer.current
+        ) {
             setIsReady(true);
         }
     }, [imagesLoadedCount, imagesWidth, isReady, refContainer.current]);
 
     useEffect(() => {
-        if(isReady && onReady) {
+        if (isReady && onReady) {
             onReady();
         }
     }, [isReady]);
 
-    return  {
+    return {
         onImageLoad: incrementLoadedImagesCount,
         isReady,
     };
 }
 
-function useInit(updateContainerWidth: () => void, onMouseUpHandler: () => void) {
+function useInit(
+    updateContainerWidth: () => void,
+    onMouseUpHandler: () => void
+) {
     useEffect(() => {
         updateContainerWidth();
         document.addEventListener('click', onMouseUpHandler);
         return () => {
             document.removeEventListener('click', onMouseUpHandler);
-        }
+        };
     }, []);
 }
 
@@ -81,7 +98,7 @@ function useResizeFeel(callback: () => void, withResizeFeel?: boolean) {
 
         return () => {
             window.removeEventListener('resize', callback);
-        }
+        };
     }, []);
 }
 
@@ -111,6 +128,8 @@ export default function BeforeAfterSlider({
     delimiterIconStyles,
     feelsOnlyTheDelimiter = false,
     delimiterColor = DEFAULT_BACKGROUND_COLOR,
+    firstComponent,
+    secondComponent,
 }: Props) {
     const classNames = ['before-after-slider'];
     className && classNames.push(className);
@@ -118,11 +137,14 @@ export default function BeforeAfterSlider({
     const refContainer = useRef<HTMLDivElement>(null);
     const [imagesWidth, setImagesWidth] = useState<number | null>(null);
     const [delimiterPercentPosition, setDelimiterPosition] = useState(
-        currentPercentPosition
-        || DEFAULT_START_PERCENT
+        currentPercentPosition || DEFAULT_START_PERCENT
     );
     const [sliderMode, setSliderMode] = useState<MODE>(MODE.DEFAULT);
-    const {onImageLoad, isReady} = useReadyStatus(imagesWidth, refContainer, onReady);
+    const { onImageLoad, isReady } = useReadyStatus(
+        imagesWidth,
+        refContainer,
+        onReady
+    );
     const [containerPosition, setContainerPosition] = useState({
         top: 0,
         left: 0,
@@ -131,7 +153,7 @@ export default function BeforeAfterSlider({
     const onFirstImageLoad = () => {
         updateContainerWidth();
         onImageLoad();
-    }
+    };
 
     /**
      * Observer start
@@ -140,9 +162,9 @@ export default function BeforeAfterSlider({
     const observerOptions = {
         threshold: [0.0, observerVisiblePercent],
     };
-    const observerCallback = function(entries: IntersectionObserverEntry[]) {
+    const observerCallback = function (entries: IntersectionObserverEntry[]) {
         if (!observer || !onVisible) return;
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
             if (entry.intersectionRatio > observerVisiblePercent) {
                 observer.disconnect();
                 onVisible();
@@ -168,33 +190,41 @@ export default function BeforeAfterSlider({
         if (!currentPercentPosition || !imagesWidth) {
             return;
         }
-        setDelimiterPosition(normalizeNewPosition(currentPercentPosition, imagesWidth));
+        setDelimiterPosition(
+            normalizeNewPosition(currentPercentPosition, imagesWidth)
+        );
     }, [currentPercentPosition, imagesWidth]);
 
     const updateContainerWidth = () => {
         if (!refContainer.current) return;
         const containerWidth = refContainer.current.offsetWidth;
         setImagesWidth(containerWidth);
-    }
+    };
 
     const onMouseUpHandler = () => {
         setSliderMode(MODE.DEFAULT);
-    }
+    };
 
     useInit(updateContainerWidth, onMouseUpHandler);
 
-    const imgStyles = !imagesWidth ? undefined : {width: `${imagesWidth}px`};
-    const secondImgContainerStyle = {width: `${delimiterPercentPosition}%`};
+    const imgStyles = !imagesWidth ? undefined : { width: `${imagesWidth}px` };
+    const secondImgContainerStyle = { width: `${delimiterPercentPosition}%` };
 
-    const preparedDelimiterIconStyles = React.useMemo(() => ({
-        backgroundColor: delimiterColor,
-        ...(delimiterIconStyles ? delimiterIconStyles : {}),
-    }), [delimiterColor, delimiterIconStyles]);
+    const preparedDelimiterIconStyles = React.useMemo(
+        () => ({
+            backgroundColor: delimiterColor,
+            ...(delimiterIconStyles ? delimiterIconStyles : {}),
+        }),
+        [delimiterColor, delimiterIconStyles]
+    );
 
-    const delimiterStyle = React.useMemo(() => ({
-        left: `${delimiterPercentPosition}%`,
-        backgroundColor: delimiterColor,
-    }), [delimiterPercentPosition, delimiterColor]);
+    const delimiterStyle = React.useMemo(
+        () => ({
+            left: `${delimiterPercentPosition}%`,
+            backgroundColor: delimiterColor,
+        }),
+        [delimiterPercentPosition, delimiterColor]
+    );
 
     const updateContainerPosition = () => {
         if (!refContainer.current) return;
@@ -204,18 +234,17 @@ export default function BeforeAfterSlider({
             top: containerCoords.top + pageYOffset,
             left: containerCoords.left + pageXOffset,
         });
-    }
+    };
 
     const onMouseDownHandler = () => {
         updateContainerPosition();
         setSliderMode(MODE.MOVE);
-    }
+    };
 
-    const onMouseMoveHandler: MouseEventHandler<HTMLDivElement>
-        = (e ) => onMoveHandler(e);
+    const onMouseMoveHandler: MouseEventHandler<HTMLDivElement> = (e) =>
+        onMoveHandler(e);
 
-    const onTouchMoveHandler: TouchEventHandler<HTMLDivElement>
-        = (e) => {
+    const onTouchMoveHandler: TouchEventHandler<HTMLDivElement> = (e) => {
         onMoveHandler(e.touches[0]);
     };
 
@@ -223,19 +252,20 @@ export default function BeforeAfterSlider({
         if (sliderMode === MODE.MOVE) {
             if (!imagesWidth) return;
             const X = e.pageX - containerPosition.left;
-            const newPosition = normalizeNewPosition(X, imagesWidth) / imagesWidth * 100;
+            const newPosition =
+                (normalizeNewPosition(X, imagesWidth) / imagesWidth) * 100;
             onChangePercentPosition
                 ? onChangePercentPosition(newPosition)
                 : setDelimiterPosition(newPosition);
         }
-    }
+    };
 
     useResizeFeel(updateContainerWidth, withResizeFeel);
 
     const onClickHandlers = {
         onMouseDown: onMouseDownHandler,
         onTouchStart: onMouseDownHandler,
-    }
+    };
 
     return (
         <div
@@ -248,28 +278,39 @@ export default function BeforeAfterSlider({
             {...(!feelsOnlyTheDelimiter ? onClickHandlers : {})}
         >
             <div className="before-after-slider__first-photo-container">
-                <img
-                    src={firstImage.imageUrl}
-                    onLoad={onFirstImageLoad}
-                    draggable={false}
-                    alt={firstImage.alt}
-                />
+                {firstImage ? (
+                    <img
+                        src={firstImage.imageUrl}
+                        onLoad={onFirstImageLoad}
+                        draggable={false}
+                        alt={firstImage.alt}
+                    />
+                ) : (
+                    firstComponent
+                )}
             </div>
             {Boolean(imagesWidth) && (
                 <>
-                    <div className="before-after-slider__second-photo-container" style={secondImgContainerStyle}>
-                        <img
-                            style={imgStyles}
-                            src={secondImage.imageUrl}
-                            onLoad={onImageLoad}
-                            draggable={false}
-                            alt={secondImage.alt}
-                        />
+                    <div
+                        className="before-after-slider__second-photo-container"
+                        style={secondImgContainerStyle}
+                    >
+                        {secondImage ? (
+                            <img
+                                style={imgStyles}
+                                src={secondImage.imageUrl}
+                                onLoad={onImageLoad}
+                                draggable={false}
+                                alt={secondImage.alt}
+                            />
+                        ) : (
+                            secondComponent
+                        )}
                     </div>
                     <div
                         className="before-after-slider__delimiter"
                         style={delimiterStyle}
-                        {...feelsOnlyTheDelimiter ? onClickHandlers : {}}
+                        {...(feelsOnlyTheDelimiter ? onClickHandlers : {})}
                     >
                         <div>
                             <div
